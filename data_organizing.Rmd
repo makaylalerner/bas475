@@ -1,0 +1,95 @@
+---
+title: "Organizing"
+author: "Group 10"
+date: "`r Sys.Date()`"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+Uploading csv's 
+
+```{r }
+r <- read.csv("r_so_traffic.csv")
+
+r$cat <- 'R'
+
+p <- read.csv("py_so_traffic.csv")
+
+p$cat <- 'P'
+
+full <- rbind(r,p)
+
+summary(full)
+
+```
+
+####
+
+```{r pressure, echo=FALSE}
+hist(full$question_count)
+
+```
+
+```{r}
+
+library(fpp3)
+
+r$date <- as.Date(with(r, paste(year, month, day,sep="-")), "%Y-%m-%d")
+#r$date
+r$date <- yearmonth(r$date)
+
+p$date <- as.Date(with(p, paste(year, month, day,sep="-")), "%Y-%m-%d")
+#p$date
+p$date <- yearmonth(p$date)
+
+
+
+```
+
+```{r}
+rqc <- aggregate(question_count ~ date, r, sum)
+rqc
+
+```
+
+
+```{r}
+pqc <- aggregate(question_count ~ date, p, sum)
+pqc
+```
+
+
+```{r}
+
+full_agg <- merge(rqc, pqc, by = "date")
+
+colnames(full_agg) <- c('date', 'r_question_count','py_question_count' )
+
+
+full_agg$total <- full_agg$r_question_count + full_agg$py_question_count
+
+full_agg
+
+
+```
+```{r}
+hist(full_agg$r_question_count)
+```
+```{r}
+hist(full_agg$py_question_count)
+```
+
+```{r}
+hist(full_agg$total)
+```
+```{r}
+full_agg <- tsibble(full_agg)
+
+autoplot(full_agg, .vars = total)
+
+```
+

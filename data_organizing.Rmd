@@ -77,6 +77,7 @@ full_agg
 
 ```
 ```{r}
+full_agg[is.na(full_agg)] = 0
 hist(full_agg$r_question_count)
 ```
 ```{r}
@@ -91,5 +92,86 @@ full_agg <- tsibble(full_agg)
 
 autoplot(full_agg, .vars = total)
 
+```
+```{r}
+
+full_agg <- 
+  full_agg %>% tsibble::fill_gaps() 
+
+drift_model <- full_agg %>% 
+  model(
+    NAIVE(total ~ drift())
+  )
+  
+drift_model %>% 
+  forecast(h=12) %>%
+  autoplot(full_agg)
+
+accuracy(drift_model)
+  
+```
+```{r}
+fit <- full_agg %>%
+  model(NAIVE(total))
+
+fit %>%
+  forecast(h="1 years") %>%
+  autoplot(full_agg)
+
+accuracy(fit)
+
+fit2 <- full_agg %>%
+  model(SNAIVE(total))
+
+fit2 %>%
+  forecast(h="1 years") %>%
+  autoplot(full_agg)
+
+accuracy(fit2)
+
+```
+
+```{r}
+fit %>%
+  forecast(h="1 years") %>%
+  view()
+
+fit2 %>%
+  forecast(h="1 years") %>%
+  view()
+```
+
+
+```{r}
+arima_fit <- full_agg %>%
+  model(
+    arima_auto = ARIMA(total), # (0,1,0)(1,0,0)
+    arima2 = ARIMA(total ~ pdq(0, 1, 0) + PDQ(1,1,1)), 
+    arima3 = ARIMA(total ~pdq(0, 1, 0) + PDQ(1,1,2)), 
+    arima4 =  ARIMA(total ~pdq(0, 1, 0) + PDQ(0,1,0)), 
+    arima5 =  ARIMA(total ~pdq(0, 1, 0) + PDQ(0,1,1)), 
+    arima6 =  ARIMA(total ~pdq(1, 1, 0) + PDQ(0,1,2)), 
+    arima7 =  ARIMA(total ~pdq(2, 0, 2) + PDQ(1,1,1)), 
+    arima8 = ARIMA(box_cox(total, lambda=0.5) ~pdq(2, 0, 2) + PDQ(1,1,1)), 
+    arima9 = ARIMA(box_cox(total, lambda=0.4) ~ pdq(2, 0, 2) + PDQ(1,1,1)),
+    
+    ) 
+
+accuracy(arima_fit)
+report(arima_fit)
+
+```
+```{r}
+arima_fit2 <- full_agg %>%
+  model(ARIMA(box_cox(total, lambda=0.4) ~pdq(2, 0, 2) + PDQ(1,1,1)))
+
+arima_fit2 %>% 
+  forecast(h="2 year") %>% 
+  autoplot(full_agg)
+
+arima_fit2 %>% gg_tsresiduals()
+
+#arima_fit2 %>%
+  #forecast(h="1 year") 
 ```
 

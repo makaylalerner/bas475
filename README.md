@@ -42,7 +42,7 @@ The objective of this project is to find the prediction model with the lowest Ro
 - After eliminating trends and seasonal changes, the optimal model shows only random, non-correlated points with an expected outlier
 - Meaning we accounted for nearly everything that could throw off the prediction
 
-![SOARIMAResiduals](/SOARIMAResiduals.png)
+![SOARIMAResiduals](/arima_final_residuals.png)
 
 ## Best: Exponential Smoothing Method
 

@@ -35,7 +35,7 @@ The objective of this project is to find the prediction model with the lowest Ro
     - Adjusted for seasonal changes
     - Had second lowest typical miss among all models tested
     
-![SOARIMA](/SOARIMA.png)
+![SOARIMA](/arima_final_graph.png)
 
 ## ARIMA Residuals
 
